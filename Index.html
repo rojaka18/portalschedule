@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Driver Portal - Depot Kapuk</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #00d4ff;
+      --primary-dark: #00aacc;
+      --accent: #ff8c00;
+      --danger: #ff3b30;
+      --success: #34c759;
+      --bg-light: #f8fafc;
+      --bg-lighter: #f4f7f9;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --border-light: #e2e8f0;
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Poppins', sans-serif; }
+    body { 
+      background: var(--bg-lighter); 
+      margin: 0; 
+      padding: 20px; 
+      color: var(--text-primary); 
+      line-height: 1.5; 
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    html { scroll-behavior: smooth; }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto; 
+      background: white; 
+      padding: 40px; 
+      border-radius: 28px; 
+      box-shadow: var(--shadow-md); 
+      display: flex; 
+      flex-direction: column;
+    }
+
+    /* ===== JUDUL - SEJARAH DI LAYAR BESAR ===== */
+    .header-title {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 32px;
+      gap: 0;
+    }
+
+    .title-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: baseline;
+      gap: 8px 16px;
+    }
+
+    .title-row .txt-primary {
+      font-size: 2.5rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .title-row .txt-accent {
+      font-size: 2.5rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .title-row .separator {
+      display: none;
+      font-size: 2.5rem;
+      font-weight: 300;
+      color: var(--text-secondary);
+    }
+
+    .sub-title {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      font-weight: 400;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    /* Search */
+    .search-group {
+      display: flex; 
+      gap: 14px; 
+      margin-bottom: 28px; 
+      width: 100%; 
+      position: relative;
+    }
+
+    input[type="text"] {
+      flex: 1; 
+      min-width: 0; 
+      padding: 16px 20px;
+      border: 2px solid var(--border-light);
+      border-radius: 14px; 
+      outline: none; 
+      font-size: 18px;
+      background: var(--bg-light);
+      font-family: 'Poppins', sans-serif; 
+      font-weight: 500; 
+      color: var(--text-primary);
+      transition: all 0.2s ease;
+    }
+
+    input[type="text"]:focus { 
+      border-color: var(--primary); 
+      background: white; 
+      box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.15); 
+    }
+    input::placeholder { color: var(--text-secondary); font-weight: 400; }
+
+    .autocomplete-list {
+      position: absolute; 
+      top: 100%; 
+      left: 0; 
+      right: 140px;
+      background: white; 
+      border: 1px solid var(--border-light);
+      border-top: none; 
+      border-radius: 0 0 14px 14px; 
+      max-height: 220px; 
+      overflow-y: auto;
+      display: none; 
+      z-index: 10; 
+      box-shadow: var(--shadow-md);
+    }
+
+    .autocomplete-list.show { display: block; }
+    .autocomplete-item {
+      padding: 14px 20px; 
+      cursor: pointer; 
+      border-bottom: 1px solid var(--border-light);
+      font-size: 16px; 
+      transition: background 0.2s;
+    }
+    .autocomplete-item:hover { background: var(--bg-light); }
+    .autocomplete-item strong { color: var(--primary); font-weight: 600; }
+
+    .btn-search {
+      flex-shrink: 0; 
+      padding: 16px 32px; 
+      background: var(--primary); 
+      color: white;
+      border: none; 
+      border-radius: 14px; 
+      cursor: pointer; 
+      font-weight: 600; 
+      font-size: 17px;
+      transition: all 0.2s ease; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      gap: 8px;
+      min-width: 120px;
+    }
+
+    .btn-search:hover { 
+      background: var(--primary-dark); 
+      transform: translateY(-2px); 
+      box-shadow: 0 6px 20px rgba(0, 212, 255, 0.35); 
+    }
+    .btn-search:active { transform: translateY(0); }
+      #loading { display: none; text-align: center; padding: 40px 20px; color: var(--text-secondary); font-size: 16px; }
+
+      .loader {
+        --color-1: var(--primary);   /* cyan, sama seperti tema */
+        --size: 1px;                 /* ukuran: 1px = 48px, 1.5px = 72px */
+
+        display: inline-block;
+        width: calc(48 * var(--size));
+        height: calc(48 * var(--size));
+        border-radius: 50%;
+        position: relative;
+        margin-bottom: 20px;
+        animation: rotate 2s linear infinite;
+      }
+      .loader::before {
+        content: '';
+        box-sizing: border-box;
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        border: calc(5 * var(--size)) solid var(--color-1);
+        animation: prixClipFix 3s linear infinite;
+      }
+
+      @keyframes rotate { 100% { transform: rotate(360deg); } }
+
+      @keyframes prixClipFix {
+        0%   { clip-path: polygon(50% 50%, 0 0, 0 0, 0 0, 0 0, 0 0); }
+        25%  { clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 0, 100% 0, 100% 0); }
+        50%  { clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 100% 100%, 100% 100%); }
+        75%  { clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 100%); }
+        100% { clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 0); }
+      }
+
+    .profile-card {
+      display: none; 
+      padding: 28px; 
+      background: var(--bg-light); 
+      border-radius: 18px; 
+      margin-bottom: 28px; 
+      border-left: 6px solid var(--accent); 
+      box-shadow: var(--shadow-sm);
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 32px;
+    }
+
+    .profile-item { 
+      display: flex; 
+      gap: 10px; 
+      padding: 8px 0;
+      font-size: 16px; 
+      color: var(--text-primary); 
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+    .profile-item:last-child { border-bottom: none; }
+    .profile-item strong { 
+      flex-shrink: 0; 
+      min-width: 130px; 
+      color: var(--text-secondary); 
+      font-weight: 600; 
+    }
+
+    #nextShiftsCard {
+      display: none; 
+      margin-bottom: 24px; 
+      padding: 20px 24px; 
+      background: #f0f9ff;
+      border-left: 5px solid var(--primary); 
+      border-radius: 14px; 
+      animation: slideUp 0.3s ease;
+    }
+
+    #nextShiftsCard h4 { 
+      margin: 0 0 14px 0; 
+      font-size: 16px; 
+      font-weight: 600; 
+      color: var(--text-primary); 
+    }
+    .shift-row { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      padding: 10px 0; 
+      border-bottom: 1px solid #d4e9f7; 
+    }
+    .shift-row:last-child { border: none; }
+    .shift-date { font-size: 15px; color: var(--text-secondary); font-weight: 500; }
+    .shift-status { 
+      font-size: 14px; 
+      font-weight: 600; 
+      padding: 6px 14px; 
+      border-radius: 8px; 
+      background: #dcfce7; 
+      color: #166534; 
+    }
+    .shift-status.off { background: #fee2e2; color: #991b1b; }
+
+    #rulesArea {
+      margin-top: 20px; 
+      padding: 18px 22px; 
+      background: #fffbf0; 
+      border-radius: 14px;
+      border: 1px solid #ffe0b2; 
+      display: none;
+    }
+
+    #rulesArea strong { 
+      font-size: 15px; 
+      color: #d97706; 
+      display: block; 
+      margin-bottom: 10px; 
+      font-weight: 600; 
+    }
+    #listRules { 
+      margin: 0; 
+      padding-left: 24px; 
+      font-size: 15px; 
+      color: #78350f; 
+      line-height: 1.6; 
+    }
+    #listRules li { margin-bottom: 8px; }
+
+    #calendarArea { display: none; width: 100%; animation: slideUp 0.3s ease; }
+    #monthName { 
+      font-size: 20px; 
+      font-weight: 600; 
+      margin-bottom: 20px; 
+      text-align: center; 
+      color: var(--text-primary); 
+    }
+
+    .calendar-container { 
+      background: white; 
+      border-radius: 16px; 
+      overflow: hidden; 
+      border: 1px solid var(--border-light); 
+    }
+    .calendar-header { 
+      display: grid; 
+      grid-template-columns: repeat(7, 1fr); 
+      background: var(--bg-light); 
+      border-bottom: 1px solid var(--border-light); 
+    }
+    .day-header { 
+      font-size: 14px; 
+      font-weight: 600; 
+      padding: 14px 8px; 
+      text-align: center; 
+      color: var(--text-secondary); 
+      text-transform: uppercase; 
+      letter-spacing: 0.5px; 
+    }
+
+    .calendar-grid { 
+      display: grid; 
+      grid-template-columns: repeat(7, 1fr); 
+      gap: 0; 
+      background: white; 
+      width: 100%; 
+      overflow: hidden; 
+    }
+    .calendar-cell { 
+      min-height: 120px; 
+      padding: 10px 6px; 
+      display: flex; 
+      flex-direction: column;
+      align-items: center; 
+      justify-content: flex-start; 
+      border: 1px solid var(--border-light); 
+      position: relative; 
+      transition: background 0.2s; 
+    }
+    .calendar-cell:hover { background: #fafcff; }
+    .calendar-cell.empty { border: none; background: transparent; }
+
+    .date-num { 
+      font-size: 16px; 
+      font-weight: 600; 
+      color: var(--text-primary); 
+      z-index: 2; 
+      margin-bottom: 6px; 
+    }
+    .calendar-cell.today .date-num {
+      background: var(--danger); 
+      color: white; 
+      width: 34px; 
+      height: 34px; 
+      display: flex;
+      align-items: center; 
+      justify-content: center; 
+      border-radius: 50%;
+    }
+
+    .status-badges { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 4px; 
+      width: 100%; 
+      flex: 1; 
+      justify-content: center; 
+      align-items: center;
+    }
+    .badge { 
+      font-size: 12px; 
+      padding: 5px 10px; 
+      border-radius: 8px; 
+      text-align: center; 
+      font-weight: 600; 
+      line-height: 1.2; 
+      width: 100%;
+      max-width: 120px;
+    }
+    .badge.shift-on { background: #dcfce7; color: #166534; border: 0.5px solid #bbf7d0; }
+    .badge.shift-off { background: #fee2e2; color: #991b1b; border: 0.5px solid #fecaca; }
+    .badge.note { background: #dbeafe; color: #1e40af; border: 0.5px solid #bfdbfe; }
+
+    #todayBadge { 
+      display: none; 
+      font-size: 15px; 
+      font-weight: 600; 
+      color: var(--danger); 
+      margin-top: 8px; 
+      padding: 12px 16px;
+      background: #fee2e2;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    #syncStatus { 
+      font-size: 14px; 
+      color: var(--text-secondary); 
+      text-align: center; 
+      margin-top: 24px; 
+      padding: 12px; 
+      background: var(--bg-light);
+      border-radius: 10px;
+    }
+    .sync-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; vertical-align: middle; }
+    .sync-dot.active { background: var(--success); }
+    .sync-dot.pending { background: #f59e0b; animation: pulse 2s infinite; }
+    .sync-dot.error { background: var(--danger); }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+    #absenBtn {
+      display: none; 
+      background: var(--danger); 
+      color: white; 
+      width: 100%; 
+      padding: 18px; 
+      border-radius: 14px; 
+      font-weight: 600; 
+      font-size: 18px; 
+      border: none; 
+      margin-top: 28px; 
+      cursor: pointer; 
+      transition: all 0.2s ease;
+    }
+
+    #absenBtn:hover { 
+      background: #e23328; 
+      transform: translateY(-2px); 
+      box-shadow: 0 6px 24px rgba(255, 59, 48, 0.35); 
+    }
+
+    .modal-overlay {
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      width: 100%; 
+      height: 100%; 
+      background: rgba(0, 0, 0, 0.5);
+      display: none; 
+      justify-content: center; 
+      align-items: center; 
+      z-index: 1000; 
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.show { display: flex; animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .pop-up {
+      background: white; 
+      padding: 36px 40px; 
+      border-radius: 24px; 
+      text-align: center; 
+      max-width: 420px; 
+      width: 90%; 
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.25); 
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+    .pop-up h4 { margin: 0 0 12px 0; font-size: 22px; font-weight: 700; }
+    .pop-up p { margin: 0 0 28px 0; font-size: 17px; color: var(--text-secondary); line-height: 1.6; }
+    .pop-up button { 
+      background: var(--primary); 
+      color: white; 
+      border: none; 
+      padding: 14px 40px; 
+      border-radius: 12px; 
+      cursor: pointer; 
+      font-weight: 600; 
+      font-size: 17px; 
+      transition: all 0.2s ease; 
+    }
+    .pop-up button:hover { background: var(--primary-dark); transform: translateY(-2px); }
+
+    /* ===== RESPONSIVE ===== */
+
+    /* Mobile (max 768px) */
+    @media (max-width: 768px) {
+      body { padding: 12px; }
+      .container { 
+        padding: 20px; 
+        max-width: 100%; 
+        border-radius: 20px; 
+        margin: 8px 0;
+      }
+
+      .header-title { margin-bottom: 20px; }
+      .title-row .txt-primary { font-size: 1.8rem; }
+      .title-row .txt-accent { font-size: 1.8rem; }
+      .title-row .separator { display: none; }
+      .sub-title { font-size: 0.75rem; margin-top: 0; }
+
+      .search-group { 
+        flex-direction: column; 
+        gap: 10px; 
+        margin-bottom: 16px; 
+      }
+      input[type="text"] { 
+        font-size: 16px; 
+        padding: 14px 16px; 
+        border-radius: 12px; 
+      }
+      .btn-search { 
+        padding: 14px; 
+        font-size: 15px; 
+        border-radius: 12px; 
+        min-width: unset;
+        width: 100%;
+      }
+      .autocomplete-list { right: 0; }
+      
+      .profile-grid {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+      .profile-item { 
+        font-size: 14px; 
+        padding: 6px 0;
+      }
+      .profile-item strong { min-width: 100px; }
+      
+      .calendar-cell { min-height: 85px; padding: 6px 3px; }
+      .date-num { font-size: 14px; }
+      .badge { font-size: 10px; padding: 4px 6px; max-width: 100%; }
+      #monthName { font-size: 16px; margin-bottom: 14px; }
+      #absenBtn { padding: 16px; font-size: 16px; margin-top: 20px; }
+      .day-header { font-size: 12px; padding: 10px 4px; }
+      
+      #todayBadge { font-size: 14px; padding: 10px 14px; }
+      .pop-up { padding: 28px 24px; }
+      .pop-up h4 { font-size: 20px; }
+      .pop-up p { font-size: 16px; }
+      #nextShiftsCard { padding: 16px 18px; }
+      #rulesArea { padding: 14px 16px; }
+      #rulesArea strong { font-size: 14px; }
+      #listRules { font-size: 14px; }
+    }
+
+    /* Tablet (769px - 1024px) */
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .container { max-width: 750px; padding: 32px; }
+      .title-row .txt-primary { font-size: 2.2rem; }
+      .title-row .txt-accent { font-size: 2.2rem; }
+      .title-row .separator { display: none; }
+      .calendar-cell { min-height: 110px; padding: 8px 4px; }
+      .profile-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* Desktop (1025px+) - JUDUL SEJAJAR */
+    @media (min-width: 1025px) {
+      .container { max-width: 960px; padding: 44px 48px; }
+
+      .header-title { margin-bottom: 36px; }
+      .title-row .txt-primary { font-size: 2.8rem; }
+      .title-row .txt-accent { font-size: 2.8rem; }
+      .title-row .separator { 
+        display: inline; /* TAMPILKAN PEMISAH "|" */
+        font-size: 2.8rem;
+        font-weight: 300;
+        color: #cbd5e1;
+        padding: 0 4px;
+      }
+      .sub-title { display: none; }
+
+      .profile-grid { grid-template-columns: 1fr 1fr; gap: 16px 40px; }
+      .calendar-cell { min-height: 130px; padding: 12px 8px; }
+      .date-num { font-size: 18px; }
+      .badge { font-size: 13px; padding: 6px 12px; }
+      #monthName { font-size: 22px; margin-bottom: 24px; }
+      .day-header { font-size: 16px; padding: 16px 8px; }
+      input[type="text"] { font-size: 20px; padding: 18px 24px; }
+      .btn-search { padding: 18px 36px; font-size: 18px; min-width: 140px; }
+      #absenBtn { padding: 20px; font-size: 20px; margin-top: 32px; }
+      .pop-up { padding: 44px 48px; max-width: 460px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+    .title-row .txt-primary { color: var(--primary); }  /* Driver Portal - cyan */
+    .title-row .txt-accent  { color: var(--accent); }   /* Depot Kapuk - orange */
+        /* ===== FIX KALENDER DI HP ===== */
+    .calendar-header,
+    .calendar-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }  /* kolom boleh mengecil */
+    .calendar-cell { min-width: 0; }
+    .badge { overflow-wrap: anywhere; }
+
+    @media (max-width: 768px) {
+      body { padding: 6px; }
+      .container { padding: 16px 10px; }
+
+      /* garis antar tanggal pakai gap, bukan border, supaya tiap kolom lebih lega */
+      .calendar-grid { gap: 1px; background: var(--border-light); }
+      .calendar-cell { border: none; background: white; padding: 6px 1px; min-height: 80px; }
+      .calendar-cell.empty { background: var(--bg-light); }
+
+      .badge { font-size: 9px; padding: 3px 1px; letter-spacing: -0.2px; border-radius: 6px; }
+      .day-header { font-size: 11px; padding: 10px 0; }
+    }
+
+
+
+  </style>
+</head>
+<body>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="pop-up" id="popUp">
+    <h4 id="popTitle" style="color: var(--danger);">Notifikasi</h4>
+    <p id="popMsg"></p>
+    <button onclick="closePop()">Mengerti</button>
+  </div>
+</div>
+
+<div class="container">
+  <!-- ===== HEADER JUDUL ===== -->
+  <div class="header-title">
+    <div class="title-row">
+      <span class="txt-primary">Driver Portal</span>
+      <span class="separator">|</span>
+      <span class="txt-accent">Depot Kapuk</span>
+    </div>
+    <div class="sub-title">Powered by 7000656</div>
+  </div>
+  
+  <div class="search-group">
+    <input 
+      type="text" 
+      id="empId" 
+      placeholder="SAP ID atau nomor polisi"
+      autocomplete="off"
+      aria-label="Cari berdasarkan SAP ID atau nomor polisi"
+    >
+    <div class="autocomplete-list" id="autocompleteList"></div>
+    <button class="btn-search" onclick="cari()" aria-label="Cari data">Cari</button>
+  </div>
+
+  <div id="loading">
+    <div class="loader"></div>
+    <div>Memuat data...</div>
+  </div>
+
+  <div id="nextShiftsCard">
+    <h4>Jadwal 3 Hari Berikutnya</h4>
+    <div id="nextShiftsList"></div>
+  </div>
+
+  <div id="profile" class="profile-card">
+    <div class="profile-grid">
+      <div class="profile-item">
+        <strong id="lbl1">Nama</strong>
+        <span><span id="dispNama">-</span></span>
+      </div>
+      <div class="profile-item">
+        <strong id="lbl2">Status</strong>
+        <span><span id="dispStatus">-</span></span>
+      </div>
+      <div class="profile-item">
+        <strong id="lbl3">No. Telepon</strong>
+        <span><span id="dispTelp">-</span></span>
+      </div>
+    </div>
+    <div id="todayBadge"></div>
+    
+    <div id="rulesArea">
+      <strong>Ketentuan & Persyaratan</strong>
+      <ul id="listRules"></ul>
+    </div>
+  </div>
+
+  <div id="calendarArea">
+    <div id="monthName"></div>
+    <div class="calendar-container">
+      <div class="calendar-header">
+        <div class="day-header">Min</div>
+        <div class="day-header">Sen</div>
+        <div class="day-header">Sel</div>
+        <div class="day-header">Rab</div>
+        <div class="day-header">Kam</div>
+        <div class="day-header">Jum</div>
+        <div class="day-header">Sab</div>
+      </div>
+      <div class="calendar-grid" id="calendarGrid"></div>
+    </div>
+    <button id="absenBtn" onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSdeld9zz__PtknsB7OfXrQQn567ei5lFFx8OIvo8TBwVq8ktw/viewform', '_blank')">
+      Saya tidak bisa masuk hari ini, lanjut ke form izin tidak bisa masuk
+    </button>
+  </div>
+
+  <div id="syncStatus">
+    <span class="sync-dot active"></span>
+    <span id="syncText">Terakhir diperbarui: sekarang</span>
+  </div>
+</div>
+
+<script>
+  // ===== HELPER FUNCTIONS =====
+  
+  function showPop(msg, title = 'Notifikasi') {
+    document.getElementById('popTitle').innerText = title;
+    document.getElementById('popMsg').innerText = msg;
+    document.getElementById('modalOverlay').classList.add('show');
+    logEvent('notification', { title, msg });
+  }
+
+  function closePop() {
+    document.getElementById('modalOverlay').classList.remove('show');
+  }
+
+  // ===== CACHING (LocalStorage) =====
+  function cacheData(key, data) {
+    try {
+      localStorage.setItem(key, JSON.stringify({ data, timestamp: Date.now() }));
+    } catch (e) {
+      console.log('Cache failed:', e);
+    }
+  }
+
+  function getCachedData(key) {
+    try {
+      const item = localStorage.getItem(key);
+      if (!item) return null;
+      const { data, timestamp } = JSON.parse(item);
+      const age = (Date.now() - timestamp) / 1000 / 60;
+      return { data, age };
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function updateSyncStatus(age) {
+    const statusEl = document.getElementById('syncStatus');
+    if (age === undefined) {
+      statusEl.innerHTML = '<span class="sync-dot active"></span><span id="syncText">Terakhir diperbarui: sekarang</span>';
+    } else if (age < 1) {
+      statusEl.innerHTML = '<span class="sync-dot active"></span><span id="syncText">Terakhir diperbarui: < 1 menit lalu</span>';
+    } else if (age < 60) {
+      statusEl.innerHTML = `<span class="sync-dot active"></span><span id="syncText">Terakhir diperbarui: ${Math.floor(age)} menit lalu</span>`;
+    } else {
+      statusEl.innerHTML = '<span class="sync-dot pending"></span><span id="syncText">Data lama, tarik ulang</span>';
+    }
+  }
+
+  // ===== ANALYTICS =====
+  function logEvent(action, details = {}) {
+    try {
+      const log = { action, timestamp: new Date().toISOString(), ...details };
+      let events = JSON.parse(localStorage.getItem('portal_events') || '[]');
+      events.push(log);
+      if (events.length > 100) events = events.slice(-100);
+      localStorage.setItem('portal_events', JSON.stringify(events));
+    } catch (e) {}
+  }
+
+  // ===== AUTOCOMPLETE =====
+  let allDrivers = [];
+
+  function setupAutocomplete() {
+    const input = document.getElementById('empId');
+    const list = document.getElementById('autocompleteList');
+
+    google.script.run.withSuccessHandler(function(drivers) {
+      allDrivers = drivers;
+    }).getDriversList();
+
+    input.addEventListener('input', function() {
+      const val = this.value.trim().toLowerCase();
+      if (val.length < 1) {
+        list.classList.remove('show');
+        return;
+      }
+
+      const filtered = allDrivers.filter(d => 
+        d.id.toLowerCase().includes(val) || 
+        d.nama.toLowerCase().includes(val)
+      );
+
+      if (filtered.length > 0) {
+        list.innerHTML = filtered.map(d => 
+          `<div class="autocomplete-item" onclick="selectDriver('${d.id}')">
+            <strong>${d.id}</strong> — ${d.nama}
+          </div>`
+        ).join('');
+        list.classList.add('show');
+      } else {
+        list.classList.remove('show');
+      }
+    });
+
+    input.addEventListener('blur', () => setTimeout(() => list.classList.remove('show'), 200));
+  }
+
+  function selectDriver(id) {
+    document.getElementById('empId').value = id;
+    document.getElementById('autocompleteList').classList.remove('show');
+    cari();
+  }
+
+  // ===== NEXT 3 SHIFTS =====
+  function renderNextShifts(listJadwal) {
+    const now = new Date();
+    const todayStr = now.toLocaleDateString('sv-SE', { timeZone: 'Asia/Jakarta' });
+
+    const upcoming = listJadwal
+      .filter(item => item.isoDate >= todayStr)
+      .slice(0, 3);
+
+    const html = upcoming.map(item => {
+      const isWorkDay = item.shift && !['LIBUR', 'OFF', ''].includes(item.shift.trim().toUpperCase());
+      const date = new Date(item.isoDate);
+      const dayName = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'][date.getDay()];
+      return `
+        <div class="shift-row">
+          <span class="shift-date">${item.tglAngka} (${dayName})</span>
+          <span class="shift-status ${!isWorkDay ? 'off' : ''}">${item.shift || '-'}</span>
+        </div>
+      `;
+    }).join('');
+
+    document.getElementById('nextShiftsList').innerHTML = html;
+    document.getElementById('nextShiftsCard').style.display = upcoming.length > 0 ? 'block' : 'none';
+  }
+
+  // ===== TODAY BADGE & COUNTDOWN =====
+  function renderTodayBadge(listJadwal) {
+    const now = new Date();
+    const todayStr = now.toLocaleDateString('sv-SE', { timeZone: 'Asia/Jakarta' });
+    const today = listJadwal.find(item => item.isoDate === todayStr);
+
+    if (!today) return;
+
+    const isWorkDay = today.shift && !['LIBUR', 'OFF', ''].includes(today.shift.trim().toUpperCase());
+    if (!isWorkDay) return;
+
+    const shiftTime = new Date(today.isoDate + ' 09:00:00');
+    const diffMs = shiftTime - now;
+    const hours = Math.floor(diffMs / 3600000);
+    const mins = Math.floor((diffMs % 3600000) / 60000);
+
+    let timeStr = '';
+    if (hours > 0) timeStr = `dalam ${hours}j ${mins}m`;
+    else if (mins > 0) timeStr = `dalam ${mins}m`;
+    else timeStr = 'dimulai sekarang!';
+
+    document.getElementById('todayBadge').innerHTML = `✅ Shift hari ini: <strong>${today.shift}</strong> — ${timeStr}`;
+    document.getElementById('todayBadge').style.display = 'block';
+  }
+
+  // ===== MAIN SEARCH & RENDER =====
+  function cari() {
+    const rawInput = document.getElementById('empId').value.trim();
+    if (!rawInput) {
+      showPop('Masukkan SAP ID atau nomor polisi terlebih dahulu', 'Input Kosong');
+      return;
+    }
+    
+    logEvent('search_initiated', { input: rawInput });
+
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('profile').style.display = 'none';
+    document.getElementById('calendarArea').style.display = 'none';
+    document.getElementById('nextShiftsCard').style.display = 'none';
+
+    const isNopol = /[a-zA-Z]/.test(rawInput);
+
+    if (isNopol) {
+      google.script.run.withSuccessHandler(renderInspeksi).getInspectionData(rawInput.toUpperCase());
+    } else {
+      google.script.run.withSuccessHandler(render).getEmployeeData(rawInput);
+    }
+  }
+
+  function renderInspeksi(res) {
+    document.getElementById('loading').style.display = 'none';
+    
+    if (!res.found) {
+      logEvent('search_failed', { type: 'inspection' });
+      showPop('Nomor polisi tidak ditemukan. Cek kembali data kendaraan.', 'Data Tidak Ditemukan');
+      return;
+    }
+
+    logEvent('search_success', { type: 'inspection', plate: res.data.plate });
+    cacheData('last_search_' + res.data.plate, res.data);
+
+    document.getElementById('profile').style.display = 'block';
+    document.getElementById('calendarArea').style.display = 'none'; 
+    document.getElementById('rulesArea').style.display = 'none';
+
+    document.getElementById('lbl1').innerText = "Plat Nomor";
+    document.getElementById('lbl2').innerText = "Nomor Lambung";
+    document.getElementById('lbl3').innerText = "Jadwal Inspeksi";
+
+    document.getElementById('profile').style.display = 'block';
+    document.getElementById('dispNama').innerText = res.data.plate;
+    document.getElementById('dispStatus').innerText = res.data.hull;
+    document.getElementById('dispTelp').innerText = res.data.day + " (" + res.data.team + ")";
+    document.getElementById('todayBadge').style.display = 'none';
+
+    updateSyncStatus();
+  }
+
+  function render(res) {
+    document.getElementById('loading').style.display = 'none';
+    
+    if (!res.found) {
+      logEvent('search_failed', { type: 'employee' });
+      showPop('SAP ID tidak ditemukan. Pastikan nomor sudah benar.', 'Data Tidak Ditemukan');
+      return;
+    }
+
+    logEvent('search_success', { type: 'employee', empId: res.biodata.nama });
+    cacheData('last_search_' + res.biodata.nama, res);
+
+    document.getElementById('lbl1').innerText = "Nama";
+    document.getElementById('lbl2').innerText = "Status";
+    document.getElementById('lbl3').innerText = "No. Telepon";
+    document.getElementById('rulesArea').style.display = res.rules && res.rules.length > 0 ? "block" : "none";
+
+    document.getElementById('profile').style.display = 'block';
+    document.getElementById('calendarArea').style.display = 'block';
+    document.getElementById('dispNama').innerText = res.biodata.nama;
+    document.getElementById('dispStatus').innerText = res.biodata.status;
+    document.getElementById('dispTelp').innerText = res.biodata.telp || '-';
+    document.getElementById('monthName').innerText = res.monthName;
+
+    const rulesContainer = document.getElementById('listRules');
+    if (rulesContainer && res.rules && res.rules.length > 0) {
+      rulesContainer.innerHTML = "";
+      res.rules.forEach(rule => {
+        const li = document.createElement("li");
+        li.innerText = rule;
+        rulesContainer.appendChild(li);
+      });
+    }
+
+    renderNextShifts(res.listJadwal);
+    renderTodayBadge(res.listJadwal);
+
+    const grid = document.getElementById('calendarGrid');
+    grid.innerHTML = '';
+    const now = new Date();
+    const todayStr = now.toLocaleDateString('sv-SE', { timeZone: 'Asia/Jakarta' });
+
+    for (let i = 0; i < res.firstDayOffset; i++) {
+      const emptyCell = document.createElement('div');
+      emptyCell.className = 'calendar-cell empty';
+      grid.appendChild(emptyCell);
+    }
+
+    let isWorkToday = false;
+    res.listJadwal.forEach(item => {
+      const isToday = (item.isoDate === todayStr);
+      const currentShift = (item.shift || "").trim().toUpperCase();
+      
+      if (isToday && currentShift !== "LIBUR" && currentShift !== "OFF" && currentShift !== "") {
+        isWorkToday = true;
+      }
+
+      const cell = document.createElement('div');
+      cell.className = `calendar-cell ${isToday ? 'today' : ''}`;
+      
+      const dateNum = document.createElement('div');
+      dateNum.className = 'date-num';
+      dateNum.innerText = item.tglAngka;
+      
+      const badges = document.createElement('div');
+      badges.className = 'status-badges';
+      
+      const shiftBadge = document.createElement('div');
+      shiftBadge.className = `badge ${(currentShift === "LIBUR" || currentShift === "OFF") ? 'shift-off' : 'shift-on'}`;
+      shiftBadge.innerText = item.shift || '-';
+      badges.appendChild(shiftBadge);
+      
+      if (item.keterangan) {
+        const noteBadge = document.createElement('div');
+        noteBadge.className = 'badge note';
+        noteBadge.innerText = item.keterangan;
+        badges.appendChild(noteBadge);
+      }
+      
+      cell.appendChild(dateNum);
+      cell.appendChild(badges);
+      grid.appendChild(cell);
+    });
+
+    document.getElementById('absenBtn').style.display = isWorkToday ? 'block' : 'none';
+    updateSyncStatus();
+  }
+
+  // ===== INIT =====
+  document.addEventListener('DOMContentLoaded', function() {
+    setupAutocomplete();
+    document.getElementById('empId').focus();
+  });
+
+  document.getElementById('empId').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') cari();
+  });
+</script>
+<!-- ===== TAMBAHAN: tempel SESUDAH </script> terakhir, tepat SEBELUM </body> (kode lama tidak diubah) ===== -->
+<script>
+  // Dropdown pencarian: gabungan Driver (SAP ID / nama) + Kendaraan (nopol / no. lambung).
+  // Memakai allDrivers, selectDriver() dan cari() yang sudah ada.
+  let allPlates = [];
+  const MAX_PER_TYPE = 30;
+
+  function escHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function normText(s) { return String(s || '').toLowerCase().replace(/\s/g, ''); }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('empId');
+    const list = document.getElementById('autocompleteList');
+
+    google.script.run
+      .withSuccessHandler(function (p) { allPlates = p || []; })
+      .getPlatesList();
+
+    // Berjalan setelah listener lama, jadi hasil gabungan ini yang tampil
+    input.addEventListener('input', function () {
+      const raw = this.value.trim().toLowerCase();
+      if (!raw) { list.classList.remove('show'); return; }
+      const key = normText(raw);
+
+      const drivers = allDrivers.filter(function (d) {
+        return d.id.toLowerCase().includes(raw) || d.nama.toLowerCase().includes(raw);
+      }).slice(0, MAX_PER_TYPE);
+
+      const plates = allPlates.filter(function (p) {
+        return normText(p.plate).includes(key) || normText(p.hull).includes(key);
+      }).slice(0, MAX_PER_TYPE);
+
+      const html =
+        drivers.map(function (d) {
+          return '<div class="autocomplete-item" data-val="' + escHtml(d.id) + '">' +
+                 '<strong>' + escHtml(d.id) + '</strong> — ' + escHtml(d.nama) + '</div>';
+        }).join('') +
+        plates.map(function (p) {
+          return '<div class="autocomplete-item" data-val="' + escHtml(p.plate) + '">' +
+                 '<strong>' + escHtml(p.plate) + '</strong>' +
+                 (p.hull ? ' — Lambung ' + escHtml(p.hull) : '') + '</div>';
+        }).join('');
+
+      list.innerHTML = html;
+      list.classList.toggle('show', html !== '');
+    });
+
+    // Klik item -> isi kolom & langsung cari (pakai fungsi lama)
+    list.addEventListener('click', function (e) {
+      const item = e.target.closest('.autocomplete-item');
+      if (item && item.dataset.val) selectDriver(item.dataset.val);
+    });
+  });
+</script>
+</body>
+</html>

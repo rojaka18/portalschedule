@@ -712,7 +712,29 @@
     <span id="syncText">Terakhir diperbarui: sekarang</span>
   </div>
 </div>
-
+  
+<script>
+const API_URL = "PASTE_URL_EXEC_DI_SINI";
+if (!(window.google && google.script && google.script.run)) {
+  window.google = window.google || {};
+  google.script = google.script || {};
+  const mk = () => {
+    let ok = () => {}, bad = () => {};
+    const proxy = new Proxy({}, { get(_, fn) {
+      if (fn === 'withSuccessHandler') return h => { ok = h; return proxy; };
+      if (fn === 'withFailureHandler') return h => { bad = h; return proxy; };
+      return (...args) => {
+        fetch(API_URL, {method:'POST', headers:{'Content-Type':'text/plain'},
+          body: JSON.stringify({fn, args})})
+          .then(r => r.json()).then(ok).catch(bad);
+      };
+    }});
+    return proxy;
+  };
+  Object.defineProperty(google.script, 'run', { get: mk });
+}
+</script>
+  
 <script>
   // ===== HELPER FUNCTIONS =====
   

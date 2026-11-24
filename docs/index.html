@@ -637,7 +637,6 @@
   <!-- ===== HEADER JUDUL ===== -->
   <div class="header-title">
     <div class="title-row">
-      <!-- <svg class="portal-logo" viewBox="0 0 64 64" aria-hidden="true"><rect x="4" y="4" width="56" height="56" rx="14" fill="#0f172a"/><path d="M13 50H25V39H35V28" fill="none" stroke="#fbbf24" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M35 28V21H44V14" fill="none" stroke="#fbbf24" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0.1 6" opacity="0.55"/><circle cx="35" cy="28" r="7.5" fill="#fbbf24" opacity="0.25"/><circle cx="35" cy="28" r="5" fill="#fbbf24"/></svg> -->
       <span class="txt-primary">Driver Portal</span>
       <span class="separator">|</span>
       <span class="txt-accent">Depot Kapuk</span>
@@ -1031,17 +1030,25 @@ if (!(window.google && google.script && google.script.run)) {
     updateSyncStatus();
   }
 
-  // ===== INIT =====
+  // ===== INIT (mendukung deep link: ?plate=B1234XYZ atau ?q=SAPID) =====
   document.addEventListener('DOMContentLoaded', function() {
     setupAutocomplete();
-    document.getElementById('empId').focus();
+
+    const params = new URLSearchParams(location.search);
+    const q = (params.get('plate') || params.get('q') || '').replace(/\s+/g, '').toUpperCase();
+
+    if (q) {
+      document.getElementById('empId').value = q;
+      cari();
+    } else {
+      document.getElementById('empId').focus();
+    }
   });
 
   document.getElementById('empId').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') cari();
   });
 </script>
-<!-- ===== TAMBAHAN: tempel SESUDAH </script> terakhir, tepat SEBELUM </body> (kode lama tidak diubah) ===== -->
 <script>
   // Dropdown pencarian: gabungan Driver (SAP ID / nama) + Kendaraan (nopol / no. lambung).
   // Memakai allDrivers, selectDriver() dan cari() yang sudah ada.

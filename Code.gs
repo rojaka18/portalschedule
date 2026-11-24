@@ -123,7 +123,6 @@ function getDriversList() {
   }
   return drivers;
 }
-// ===== TAMBAHAN: tempel di PALING BAWAH Code.gs (kode lama tidak diubah) =====
 
 // Daftar nopol + nomor lambung dari sheet Inspection_Schedule untuk dropdown pencarian
 function getPlatesList() {
